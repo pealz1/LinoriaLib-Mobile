@@ -2758,165 +2758,236 @@ do
 		Parent = Library.NotificationArea;
 	});
 
-	-- ── Watermark (styled to match CreateToggleButton) ──────────────────
-	local WatermarkOuter = Library:Create('Frame', {
-		BackgroundColor3 = Library.OutlineColor;
-		BorderSizePixel  = 0;
-		Position         = UDim2.fromOffset(10, 45);
-		Size             = UDim2.fromOffset(200, 28);
-		ZIndex           = 200;
-		Visible          = false;
-		Parent           = ScreenGui;
-	});
+-- ── Watermark (segmented: Title | seg | seg | ...) ──────────────────
+local _WM_H = 28
 
-	Library:Create('UICorner', {
-		CornerRadius = UDim.new(0, 4);
-		Parent       = WatermarkOuter;
-	});
+local WatermarkOuter = Library:Create('Frame', {
+    BackgroundColor3 = Library.OutlineColor;
+    BorderSizePixel  = 0;
+    Position         = UDim2.fromOffset(10, 45);
+    Size             = UDim2.fromOffset(200, _WM_H);
+    ZIndex           = 200;
+    Visible          = false;
+    Parent           = ScreenGui;
+});
+Library:Create('UICorner', { CornerRadius = UDim.new(0, 4); Parent = WatermarkOuter; });
+Library:AddToRegistry(WatermarkOuter, { BackgroundColor3 = 'OutlineColor'; });
 
-	Library:AddToRegistry(WatermarkOuter, {
-		BackgroundColor3 = 'OutlineColor';
-	});
+-- Glowing accent border stroke
+local WatermarkStroke = Library:Create('UIStroke', {
+    Color        = Library.AccentColor;
+    Thickness    = 1;
+    Transparency = 0.55;
+    Parent       = WatermarkOuter;
+});
+Library:AddToRegistry(WatermarkStroke, { Color = 'AccentColor'; });
 
-	-- Drop-shadow illusion
-	local WatermarkShadow = Library:Create('Frame', {
-		BackgroundColor3       = Color3.new(0, 0, 0);
-		BackgroundTransparency = 0.6;
-		BorderSizePixel        = 0;
-		Position               = UDim2.new(0, -1, 0, 1);
-		Size                   = UDim2.new(1, 2, 1, 2);
-		ZIndex                 = 199;
-		Parent                 = WatermarkOuter;
-	});
+-- Drop shadow
+local WatermarkShadow = Library:Create('Frame', {
+    BackgroundColor3       = Color3.new(0, 0, 0);
+    BackgroundTransparency = 0.6;
+    BorderSizePixel        = 0;
+    Position               = UDim2.new(0, -1, 0, 1);
+    Size                   = UDim2.new(1, 2, 1, 2);
+    ZIndex                 = 199;
+    Parent                 = WatermarkOuter;
+});
+Library:Create('UICorner', { CornerRadius = UDim.new(0, 5); Parent = WatermarkShadow; });
 
-	Library:Create('UICorner', {
-		CornerRadius = UDim.new(0, 5);
-		Parent       = WatermarkShadow;
-	});
+-- Inner background
+local WatermarkInner = Library:Create('Frame', {
+    BackgroundColor3 = Library.MainColor;
+    BorderSizePixel  = 0;
+    Position         = UDim2.new(0, 1, 0, 1);
+    Size             = UDim2.new(1, -2, 1, -2);
+    ZIndex           = 201;
+    Parent           = WatermarkOuter;
+});
+Library:Create('UICorner', { CornerRadius = UDim.new(0, 3); Parent = WatermarkInner; });
+Library:AddToRegistry(WatermarkInner, { BackgroundColor3 = 'MainColor'; });
 
-	-- Inner background
-	local WatermarkInner = Library:Create('Frame', {
-		BackgroundColor3 = Library.MainColor;
-		BorderSizePixel  = 0;
-		Position         = UDim2.new(0, 1, 0, 1);
-		Size             = UDim2.new(1, -2, 1, -2);
-		ZIndex           = 201;
-		Parent           = WatermarkOuter;
-	});
+-- Top accent bar
+local WatermarkAccentBar = Library:Create('Frame', {
+    BackgroundColor3 = Library.AccentColor;
+    BorderSizePixel  = 0;
+    Size             = UDim2.new(1, 0, 0, 2);
+    ZIndex           = 203;
+    Parent           = WatermarkInner;
+});
+Library:Create('UICorner', { CornerRadius = UDim.new(0, 3); Parent = WatermarkAccentBar; });
+Library:AddToRegistry(WatermarkAccentBar, { BackgroundColor3 = 'AccentColor'; });
 
-	Library:Create('UICorner', {
-		CornerRadius = UDim.new(0, 3);
-		Parent       = WatermarkInner;
-	});
+-- Bottom accent bar (subtle)
+local WatermarkAccentBarBottom = Library:Create('Frame', {
+    BackgroundColor3       = Library.AccentColor;
+    BackgroundTransparency = 0.75;
+    BorderSizePixel        = 0;
+    AnchorPoint            = Vector2.new(0, 1);
+    Position               = UDim2.new(0, 0, 1, 0);
+    Size                   = UDim2.new(1, 0, 0, 1);
+    ZIndex                 = 203;
+    Parent                 = WatermarkInner;
+});
+Library:Create('UICorner', { CornerRadius = UDim.new(0, 3); Parent = WatermarkAccentBarBottom; });
+Library:AddToRegistry(WatermarkAccentBarBottom, { BackgroundColor3 = 'AccentColor'; });
 
-	Library:AddToRegistry(WatermarkInner, {
-		BackgroundColor3 = 'MainColor';
-	});
+-- Horizontal segment container
+local WatermarkSegs = Library:Create('Frame', {
+    BackgroundTransparency = 1;
+    Position               = UDim2.new(0, 6, 0, 2);
+    Size                   = UDim2.new(1, -12, 1, -2);
+    ZIndex                 = 204;
+    Parent                 = WatermarkInner;
+});
+Library:Create('UIListLayout', {
+    FillDirection     = Enum.FillDirection.Horizontal;
+    VerticalAlignment = Enum.VerticalAlignment.Center;
+    SortOrder         = Enum.SortOrder.LayoutOrder;
+    Padding           = UDim.new(0, 0);
+    Parent            = WatermarkSegs;
+});
 
-	-- Top accent bar
-	local WatermarkAccentBar = Library:Create('Frame', {
-		BackgroundColor3 = Library.AccentColor;
-		BorderSizePixel  = 0;
-		Size             = UDim2.new(1, 0, 0, 2);
-		ZIndex           = 203;
-		Parent           = WatermarkInner;
-	});
+-- UIScale for hover bounce
+local WatermarkScale  = Instance.new('UIScale');
+WatermarkScale.Scale  = 1;
+WatermarkScale.Parent = WatermarkOuter;
 
-	Library:Create('UICorner', {
-		CornerRadius = UDim.new(0, 3);
-		Parent       = WatermarkAccentBar;
-	});
+-- ── Colour helpers ────────────────────────────────────────────────
+local function _wmFpsCol(v)
+    if v >= 144 then return Color3.fromRGB(80, 255, 120)
+    elseif v >= 60  then return Color3.fromRGB(100, 220, 100)
+    elseif v >= 30  then return Color3.fromRGB(255, 210, 50)
+    else                 return Color3.fromRGB(255, 80, 80) end
+end
+local function _wmMsCol(v)
+    if v <= 50  then return Color3.fromRGB(80, 255, 120)
+    elseif v <= 100 then return Color3.fromRGB(100, 220, 100)
+    elseif v <= 200 then return Color3.fromRGB(255, 210, 50)
+    else                 return Color3.fromRGB(255, 80, 80) end
+end
+local function _wmSegCol(seg, isFirst)
+    if isFirst then return Library.AccentColor end
+    local t   = seg:match('^%s*(.-)%s*$')
+    local fps = t:match('^(%d+)%s*[Ff][Pp][Ss]$')
+    if fps then return _wmFpsCol(tonumber(fps)) end
+    local ms  = t:match('^(%d+)%s*[Mm][Ss]$')
+    if ms  then return _wmMsCol(tonumber(ms))  end
+    return Library.FontColor
+end
+local function _wmLighten(c, a)
+    return Color3.new(math.clamp(c.R+a,0,1), math.clamp(c.G+a,0,1), math.clamp(c.B+a,0,1))
+end
 
-	Library:AddToRegistry(WatermarkAccentBar, {
-		BackgroundColor3 = 'AccentColor';
-	});
+-- ── Segment builder (called every SetWatermark) ───────────────────
+local function _wmRebuild(text)
+    for _, ch in next, WatermarkSegs:GetChildren() do
+        if not ch:IsA('UIListLayout') then ch:Destroy() end
+    end
 
-	-- Bottom accent bar (subtle)
-	local WatermarkAccentBarBottom = Library:Create('Frame', {
-		BackgroundColor3       = Library.AccentColor;
-		BackgroundTransparency = 0.75;
-		BorderSizePixel        = 0;
-		AnchorPoint            = Vector2.new(0, 1);
-		Position               = UDim2.new(0, 0, 1, 0);
-		Size                   = UDim2.new(1, 0, 0, 1);
-		ZIndex                 = 203;
-		Parent                 = WatermarkInner;
-	});
+    local parts = {}
+    for p in (text .. '|'):gmatch('([^|]*)|') do
+        local t = p:match('^%s*(.-)%s*$')
+        if t ~= '' then table.insert(parts, t) end
+    end
 
-	Library:Create('UICorner', {
-		CornerRadius = UDim.new(0, 3);
-		Parent       = WatermarkAccentBarBottom;
-	});
+    local SEP    = ' | '
+    local SEP_TS = 11
+    local totalW = 0
 
-	Library:AddToRegistry(WatermarkAccentBarBottom, {
-		BackgroundColor3 = 'AccentColor';
-	});
+    for i, part in ipairs(parts) do
+        local isFirst = (i == 1)
+        local col     = _wmSegCol(part, isFirst)
+        local ts      = isFirst and 13 or 12
 
-	-- UIScale for hover animation
-	local WatermarkScale = Instance.new('UIScale');
-	WatermarkScale.Scale  = 1;
-	WatermarkScale.Parent = WatermarkOuter;
+        -- Pipe separator (skipped before first segment)
+        if i > 1 then
+            local sw = Library:GetTextBounds(SEP, Library.Font, SEP_TS)
+            local sf = Library:Create('Frame', {
+                BackgroundTransparency = 1; Size = UDim2.new(0, sw, 1, 0);
+                ZIndex = 205; Parent = WatermarkSegs;
+            });
+            Library:Create('TextLabel', {
+                BackgroundTransparency = 1; Size = UDim2.new(1, 0, 1, 0);
+                Font = Library.Font; Text = SEP;
+                TextColor3 = Color3.fromRGB(45, 55, 75);
+                TextSize = SEP_TS; TextStrokeTransparency = 1;
+                ZIndex = 205; Parent = sf;
+            });
+            totalW = totalW + sw
+        end
 
-	local WatermarkLabel = Library:CreateLabel({
-		Position       = UDim2.new(0, 8, 0, 0);
-		Size           = UDim2.new(1, -12, 1, 0);
-		TextSize       = 12;
-		TextXAlignment = Enum.TextXAlignment.Left;
-		ZIndex         = 204;
-		Parent         = WatermarkInner;
-	});
+        local tw = Library:GetTextBounds(part, Library.Font, ts)
+        local sf = Library:Create('Frame', {
+            BackgroundTransparency = 1; Size = UDim2.new(0, tw + 4, 1, 0);
+            ZIndex = 205; Parent = WatermarkSegs;
+        });
 
-	-- Hover effects (matching CreateToggleButton)
-	local _wmHovered = false;
-	local _wmFastTween   = TweenInfo.new(0.1,  Enum.EasingStyle.Quad, Enum.EasingDirection.Out);
+        local sl = Library:CreateLabel({
+            Size           = UDim2.new(1, 0, 1, 0);
+            Text           = part;
+            TextColor3     = col;
+            TextSize       = ts;
+            TextXAlignment = Enum.TextXAlignment.Center;
+            ZIndex         = 206;
+            Parent         = sf;
+        });
 
-	local function _wmLighten(c, amt)
-		return Color3.new(
-			math.clamp(c.R + amt, 0, 1),
-			math.clamp(c.G + amt, 0, 1),
-			math.clamp(c.B + amt, 0, 1)
-		);
-	end;
+        -- Replace default registry entry with our custom colour
+        Library:RemoveFromRegistry(sl)
 
-	WatermarkOuter.MouseEnter:Connect(function()
-		if _wmHovered then return end;
-		_wmHovered = true;
+        if isFirst then
+            -- Give the title a coloured text-stroke glow
+            local stroke = sl:FindFirstChildOfClass('UIStroke')
+            if stroke then
+                stroke.Color        = Library.AccentColor
+                stroke.Transparency = 0.3
+                Library:AddToRegistry(stroke, { Color = 'AccentColor' })
+            end
+            Library:AddToRegistry(sl, { TextColor3 = 'AccentColor' })
+        else
+            local captured = col
+            Library:AddToRegistry(sl, {
+                TextColor3 = (col == Library.FontColor)
+                    and 'FontColor'
+                    or  function() return captured end
+            })
+        end
 
-		TweenService:Create(WatermarkInner, _wmFastTween, {
-			BackgroundColor3 = _wmLighten(Library.MainColor, 0.05);
-		}):Play();
+        totalW = totalW + tw + 4
+    end
 
-		TweenService:Create(WatermarkAccentBar, _wmFastTween, {
-			Size = UDim2.new(1, 0, 0, 3);
-		}):Play();
+    WatermarkOuter.Size = UDim2.fromOffset(math.max(totalW + 16, 80), _WM_H)
+end
 
-		TweenService:Create(WatermarkScale, _wmFastTween, {
-			Scale = 1.04;
-		}):Play();
-	end);
+-- ── Hover / leave ─────────────────────────────────────────────────
+local _wmHov = false
+local _wmFT  = TweenInfo.new(0.1, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
 
-	WatermarkOuter.MouseLeave:Connect(function()
-		if not _wmHovered then return end;
-		_wmHovered = false;
+WatermarkOuter.MouseEnter:Connect(function()
+    if _wmHov then return end; _wmHov = true
+    TweenService:Create(WatermarkInner,     _wmFT, { BackgroundColor3 = _wmLighten(Library.MainColor, 0.05) }):Play()
+    TweenService:Create(WatermarkAccentBar, _wmFT, { Size = UDim2.new(1, 0, 0, 3) }):Play()
+    TweenService:Create(WatermarkStroke,    _wmFT, { Transparency = 0.1 }):Play()
+    TweenService:Create(WatermarkScale,     _wmFT, { Scale = 1.04 }):Play()
+end)
+WatermarkOuter.MouseLeave:Connect(function()
+    if not _wmHov then return end; _wmHov = false
+    TweenService:Create(WatermarkInner,     _wmFT, { BackgroundColor3 = Library.MainColor }):Play()
+    TweenService:Create(WatermarkAccentBar, _wmFT, { Size = UDim2.new(1, 0, 0, 2) }):Play()
+    TweenService:Create(WatermarkStroke,    _wmFT, { Transparency = 0.55 }):Play()
+    TweenService:Create(WatermarkScale,     _wmFT, { Scale = 1 }):Play()
+end)
 
-		TweenService:Create(WatermarkInner, _wmFastTween, {
-			BackgroundColor3 = Library.MainColor;
-		}):Play();
+-- Compat label (kept so nothing breaks if WatermarkText is referenced)
+local WatermarkLabel = Library:CreateLabel({
+    Size = UDim2.new(0, 0, 0, 0); TextTransparency = 1; ZIndex = 204; Parent = WatermarkInner;
+});
 
-		TweenService:Create(WatermarkAccentBar, _wmFastTween, {
-			Size = UDim2.new(1, 0, 0, 2);
-		}):Play();
-
-		TweenService:Create(WatermarkScale, _wmFastTween, {
-			Scale = 1;
-		}):Play();
-	end);
-
-	Library.Watermark          = WatermarkOuter;
-	Library.WatermarkText      = WatermarkLabel;
-	Library.WatermarkAccentBar = WatermarkAccentBar;
-	Library:MakeDraggable(Library.Watermark);
-
+Library.Watermark          = WatermarkOuter;
+Library.WatermarkText      = WatermarkLabel;
+Library.WatermarkAccentBar = WatermarkAccentBar;
+Library._WmRebuild         = _wmRebuild;
+Library:MakeDraggable(Library.Watermark);
 
 
 	local KeybindOuter = Library:Create('Frame', {
@@ -2990,14 +3061,12 @@ do
 end;
 
 function Library:SetWatermarkVisibility(Bool)
-	Library.Watermark.Visible = Bool;
+    Library.Watermark.Visible = Bool;
 end;
 
 function Library:SetWatermark(Text)
-	local X = Library:GetTextBounds(Text, Library.Font, 12);
-	Library.Watermark.Size = UDim2.fromOffset(X + 20, 28);
-	Library:SetWatermarkVisibility(true);
-	Library.WatermarkText.Text = Text;
+    Library._WmRebuild(Text);
+    Library:SetWatermarkVisibility(true);
 end;
 
 function Library:CreateToggleButton(Text)
