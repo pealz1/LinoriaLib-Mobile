@@ -2770,84 +2770,240 @@ do
 	end;
 end;
 
--- < Create other UI elements >
-do
-	Library.NotificationArea = Library:Create('Frame', {
-		BackgroundTransparency = 1;
-		Position = UDim2.new(0, 0, 0, 40);
-		Size = UDim2.new(0, 300, 0, 200);
-		ZIndex = 100;
-		Parent = ScreenGui;
-	});
+-- ── Watermark (styled to match CreateToggleButton) ───────────────────────
+local WatermarkOuter = Library:Create('Frame', {
+	BackgroundColor3 = Library.OutlineColor;
+	BorderSizePixel  = 0;
+	Position         = UDim2.fromOffset(100, 10);
+	Size             = UDim2.fromOffset(213, 28);
+	ZIndex           = 200;
+	Visible          = false;
+	Parent           = ScreenGui;
+});
 
-	Library:Create('UIListLayout', {
-		Padding = UDim.new(0, 4);
-		FillDirection = Enum.FillDirection.Vertical;
-		SortOrder = Enum.SortOrder.LayoutOrder;
-		Parent = Library.NotificationArea;
-	});
+Library:Create('UICorner', {
+	CornerRadius = UDim.new(0, 4);
+	Parent       = WatermarkOuter;
+});
 
-	local WatermarkOuter = Library:Create('Frame', {
-		BorderColor3 = Color3.new(0, 0, 0);
-		Position = UDim2.new(0, 100, 0, -25);
-		Size = UDim2.new(0, 213, 0, 20);
-		ZIndex = 200;
-		Visible = false;
-		Parent = ScreenGui;
-	});
+Library:AddToRegistry(WatermarkOuter, {
+	BackgroundColor3 = 'OutlineColor';
+});
 
-	local WatermarkInner = Library:Create('Frame', {
+-- Drop shadow (same as toggle button)
+local WatermarkShadow = Library:Create('Frame', {
+	BackgroundColor3       = Color3.new(0, 0, 0);
+	BackgroundTransparency = 0.6;
+	BorderSizePixel        = 0;
+	Position               = UDim2.new(0, -1, 0, 1);
+	Size                   = UDim2.new(1, 2, 1, 2);
+	ZIndex                 = 199;
+	Parent                 = WatermarkOuter;
+});
+
+Library:Create('UICorner', {
+	CornerRadius = UDim.new(0, 5);
+	Parent       = WatermarkShadow;
+});
+
+-- Inner background
+local WatermarkInner = Library:Create('Frame', {
+	BackgroundColor3 = Library.MainColor;
+	BorderSizePixel  = 0;
+	Position         = UDim2.new(0, 1, 0, 1);
+	Size             = UDim2.new(1, -2, 1, -2);
+	ZIndex           = 201;
+	Parent           = WatermarkOuter;
+});
+
+Library:Create('UICorner', {
+	CornerRadius = UDim.new(0, 3);
+	Parent       = WatermarkInner;
+});
+
+Library:AddToRegistry(WatermarkInner, {
+	BackgroundColor3 = 'MainColor';
+});
+
+-- Top accent bar
+local WatermarkAccentBar = Library:Create('Frame', {
+	BackgroundColor3 = Library.AccentColor;
+	BorderSizePixel  = 0;
+	Size             = UDim2.new(1, 0, 0, 2);
+	ZIndex           = 203;
+	Parent           = WatermarkInner;
+});
+
+Library:Create('UICorner', {
+	CornerRadius = UDim.new(0, 3);
+	Parent       = WatermarkAccentBar;
+});
+
+Library:AddToRegistry(WatermarkAccentBar, {
+	BackgroundColor3 = 'AccentColor';
+});
+
+-- Bottom accent bar (subtle mirror)
+local WatermarkAccentBarBottom = Library:Create('Frame', {
+	BackgroundColor3       = Library.AccentColor;
+	BackgroundTransparency = 0.75;
+	BorderSizePixel        = 0;
+	AnchorPoint            = Vector2.new(0, 1);
+	Position               = UDim2.new(0, 0, 1, 0);
+	Size                   = UDim2.new(1, 0, 0, 1);
+	ZIndex                 = 203;
+	Parent                 = WatermarkInner;
+});
+
+Library:Create('UICorner', {
+	CornerRadius = UDim.new(0, 3);
+	Parent       = WatermarkAccentBarBottom;
+});
+
+Library:AddToRegistry(WatermarkAccentBarBottom, {
+	BackgroundColor3 = 'AccentColor';
+});
+
+-- ── SPECIAL: Pulsing live-status dot ────────────────────────────────────
+-- A small glowing ring that breathes with the accent color, 
+-- indicating the script is active/running live.
+local LiveDot = Library:Create('Frame', {
+	BackgroundColor3 = Library.AccentColor;
+	BorderSizePixel  = 0;
+	AnchorPoint      = Vector2.new(0.5, 0.5);
+	Position         = UDim2.new(0, 12, 0.5, 0);
+	Size             = UDim2.fromOffset(7, 7);
+	ZIndex           = 205;
+	Parent           = WatermarkInner;
+});
+
+Library:Create('UICorner', {
+	CornerRadius = UDim.new(1, 0);
+	Parent       = LiveDot;
+});
+
+Library:AddToRegistry(LiveDot, {
+	BackgroundColor3 = 'AccentColor';
+});
+
+-- Glow ring that pulses outward
+local LiveDotGlow = Library:Create('Frame', {
+	BackgroundColor3       = Library.AccentColor;
+	BackgroundTransparency = 0.55;
+	BorderSizePixel        = 0;
+	AnchorPoint            = Vector2.new(0.5, 0.5);
+	Position               = UDim2.new(0.5, 0, 0.5, 0);
+	Size                   = UDim2.fromOffset(7, 7);
+	ZIndex                 = 204;
+	Parent                 = LiveDot;
+});
+
+Library:Create('UICorner', {
+	CornerRadius = UDim.new(1, 0);
+	Parent       = LiveDotGlow;
+});
+
+Library:AddToRegistry(LiveDotGlow, {
+	BackgroundColor3 = 'AccentColor';
+});
+
+-- Vertical divider (icon | text, same as toggle button)
+local WatermarkDivider = Library:Create('Frame', {
+	BackgroundColor3       = Library.OutlineColor;
+	BackgroundTransparency = 0.4;
+	BorderSizePixel        = 0;
+	Position               = UDim2.new(0, 22, 0, 4);
+	Size                   = UDim2.new(0, 1, 1, -8);
+	ZIndex                 = 204;
+	Parent                 = WatermarkInner;
+});
+
+Library:AddToRegistry(WatermarkDivider, {
+	BackgroundColor3 = 'OutlineColor';
+});
+
+-- Text
+local WatermarkLabel = Library:CreateLabel({
+	Position       = UDim2.new(0, 27, 0, 0);
+	Size           = UDim2.new(1, -31, 1, 0);
+	TextSize       = 12;
+	TextXAlignment = Enum.TextXAlignment.Left;
+	ZIndex         = 204;
+	Parent         = WatermarkInner;
+});
+
+-- UIScale for hover bounce (same as toggle button)
+local WatermarkScale = Instance.new('UIScale');
+WatermarkScale.Scale  = 1;
+WatermarkScale.Parent = WatermarkOuter;
+
+-- Hover sound
+local WmHoverSound = Instance.new('Sound');
+WmHoverSound.SoundId             = 'rbxassetid://6026984224';
+WmHoverSound.Volume              = 0.12;
+WmHoverSound.RollOffMaxDistance  = 0;
+WmHoverSound.Parent              = WatermarkOuter;
+
+local wmFastTween   = TweenInfo.new(0.1,  Enum.EasingStyle.Quad, Enum.EasingDirection.Out);
+local wmBounceTween = TweenInfo.new(0.25, Enum.EasingStyle.Back,  Enum.EasingDirection.Out);
+
+local wmHovered = false;
+
+local function WmLighten(c, amt)
+	return Color3.new(
+		math.clamp(c.R + amt, 0, 1),
+		math.clamp(c.G + amt, 0, 1),
+		math.clamp(c.B + amt, 0, 1)
+	);
+end;
+
+WatermarkOuter.MouseEnter:Connect(function()
+	if wmHovered then return end;
+	wmHovered = true;
+	pcall(function() WmHoverSound:Play() end);
+
+	TweenService:Create(WatermarkInner, wmFastTween, {
+		BackgroundColor3 = WmLighten(Library.MainColor, 0.05);
+	}):Play();
+
+	TweenService:Create(WatermarkAccentBar, wmFastTween, {
+		Size = UDim2.new(1, 0, 0, 3);
+	}):Play();
+
+	TweenService:Create(WatermarkScale, wmFastTween, {
+		Scale = 1.04;
+	}):Play();
+end);
+
+WatermarkOuter.MouseLeave:Connect(function()
+	if not wmHovered then return end;
+	wmHovered = false;
+
+	TweenService:Create(WatermarkInner, wmFastTween, {
 		BackgroundColor3 = Library.MainColor;
-		BorderColor3 = Library.AccentColor;
-		BorderMode = Enum.BorderMode.Inset;
-		Size = UDim2.new(1, 0, 1, 0);
-		ZIndex = 201;
-		Parent = WatermarkOuter;
-	});
+	}):Play();
 
-	Library:AddToRegistry(WatermarkInner, {
-		BorderColor3 = 'AccentColor';
-	});
+	TweenService:Create(WatermarkAccentBar, wmFastTween, {
+		Size = UDim2.new(1, 0, 0, 2);
+	}):Play();
 
-	local InnerFrame = Library:Create('Frame', {
-		BackgroundColor3 = Color3.new(1, 1, 1);
-		BorderSizePixel = 0;
-		Position = UDim2.new(0, 1, 0, 1);
-		Size = UDim2.new(1, -2, 1, -2);
-		ZIndex = 202;
-		Parent = WatermarkInner;
-	});
+	TweenService:Create(WatermarkScale, wmBounceTween, {
+		Scale = 1;
+	}):Play();
+end);
 
-	local Gradient = Library:Create('UIGradient', {
-		Color = ColorSequence.new({
-			ColorSequenceKeypoint.new(0, Library:GetDarkerColor(Library.MainColor)),
-			ColorSequenceKeypoint.new(1, Library.MainColor),
-		});
-		Rotation = -90;
-		Parent = InnerFrame;
-	});
+-- Start the pulsing glow loop on the live dot
+task.spawn(function()
+	local pulseTween = TweenInfo.new(0.85, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut, -1, true);
+	TweenService:Create(LiveDotGlow, pulseTween, {
+		Size                   = UDim2.fromOffset(13, 13);
+		BackgroundTransparency = 0.88;
+	}):Play();
+end);
 
-	Library:AddToRegistry(Gradient, {
-		Color = function()
-			return ColorSequence.new({
-				ColorSequenceKeypoint.new(0, Library:GetDarkerColor(Library.MainColor)),
-				ColorSequenceKeypoint.new(1, Library.MainColor),
-			});
-		end
-	});
-
-	local WatermarkLabel = Library:CreateLabel({
-		Position = UDim2.new(0, 5, 0, 0);
-		Size = UDim2.new(1, -4, 1, 0);
-		TextSize = 14;
-		TextXAlignment = Enum.TextXAlignment.Left;
-		ZIndex = 203;
-		Parent = InnerFrame;
-	});
-
-	Library.Watermark = WatermarkOuter;
-	Library.WatermarkText = WatermarkLabel;
-	Library:MakeDraggable(Library.Watermark);
+Library.Watermark = WatermarkOuter;
+Library.WatermarkText = WatermarkLabel;
+Library:MakeDraggable(Library.Watermark);
 
 
 
@@ -2926,11 +3082,11 @@ function Library:SetWatermarkVisibility(Bool)
 end;
 
 function Library:SetWatermark(Text)
-	local X, Y = Library:GetTextBounds(Text, Library.Font, 14);
-	Library.Watermark.Size = UDim2.new(0, X + 15, 0, (Y * 1.5) + 3);
-	Library:SetWatermarkVisibility(true)
-
 	Library.WatermarkText.Text = Text;
+	local X = Library:GetTextBounds(Text, Library.Font, 12);
+	-- 27px left offset (dot+divider) + 8px right padding
+	Library.Watermark.Size = UDim2.fromOffset(X + 27 + 12, 28);
+	Library:SetWatermarkVisibility(true);
 end;
 
 function Library:CreateToggleButton(Text)
