@@ -3247,10 +3247,10 @@ end;
             end;
 
             isDragging = false;
-    end);
+    end)
+		end)
 
     -- Mobile TouchTap fallback
--- Mobile TouchTap fallback
     ButtonOuter.TouchTap:Connect(function()
         if not isDragging then
             pcall(function() ClickSound:Play() end)
