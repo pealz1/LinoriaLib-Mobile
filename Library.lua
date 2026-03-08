@@ -2936,93 +2936,320 @@ end;
 function Library:CreateToggleButton(Text)
     Text = Text or 'Menu';
 
+    local TweenService = game:GetService('TweenService');
+    local fastTween  = TweenInfo.new(0.1,  Enum.EasingStyle.Quad, Enum.EasingDirection.Out);
+    local bounceTween = TweenInfo.new(0.25, Enum.EasingStyle.Back, Enum.EasingDirection.Out);
+
+    -- ── Outer border frame ──────────────────────────────────────────
     local ButtonOuter = Library:Create('Frame', {
-        BackgroundColor3 = Color3.new(0, 0, 0);
-        BorderColor3 = Color3.new(0, 0, 0);
-        Position = UDim2.fromOffset(10, 10);
-        Size = UDim2.fromOffset(80, 26);
-        ZIndex = 300;
-        Parent = ScreenGui;
+        BackgroundColor3 = Library.OutlineColor or Color3.fromRGB(60, 60, 60);
+        BorderSizePixel  = 0;
+        Position         = UDim2.fromOffset(10, 10);
+        Size             = UDim2.fromOffset(96, 28);
+        ZIndex           = 300;
+        Parent           = ScreenGui;
     });
 
+    Library:Create('UICorner', {
+        CornerRadius = UDim.new(0, 4);
+        Parent       = ButtonOuter;
+    });
+
+    Library:AddToRegistry(ButtonOuter, {
+        BackgroundColor3 = 'OutlineColor';
+    });
+
+    -- Drop-shadow illusion (slightly larger dark frame behind)
+    local Shadow = Library:Create('Frame', {
+        BackgroundColor3 = Color3.new(0, 0, 0);
+        BackgroundTransparency = 0.6;
+        BorderSizePixel  = 0;
+        Position         = UDim2.new(0, -1, 0, 1);
+        Size             = UDim2.new(1, 2, 1, 2);
+        ZIndex           = 299;
+        Parent           = ButtonOuter;
+    });
+
+    Library:Create('UICorner', {
+        CornerRadius = UDim.new(0, 5);
+        Parent       = Shadow;
+    });
+
+    -- ── Inner background ────────────────────────────────────────────
     local ButtonInner = Library:Create('Frame', {
         BackgroundColor3 = Library.MainColor;
-        BorderColor3 = Library.AccentColor;
-        BorderMode = Enum.BorderMode.Inset;
-        Size = UDim2.new(1, 0, 1, 0);
-        ZIndex = 301;
-        Parent = ButtonOuter;
+        BorderSizePixel  = 0;
+        Position         = UDim2.new(0, 1, 0, 1);
+        Size             = UDim2.new(1, -2, 1, -2);
+        ZIndex           = 301;
+        Parent           = ButtonOuter;
+    });
+
+    Library:Create('UICorner', {
+        CornerRadius = UDim.new(0, 3);
+        Parent       = ButtonInner;
     });
 
     Library:AddToRegistry(ButtonInner, {
         BackgroundColor3 = 'MainColor';
-        BorderColor3 = 'AccentColor';
     });
 
+    -- ── Accent bar (top edge, matches groupbox style) ───────────────
     local AccentBar = Library:Create('Frame', {
         BackgroundColor3 = Library.AccentColor;
-        BorderSizePixel = 0;
-        Size = UDim2.new(1, 0, 0, 2);
-        ZIndex = 302;
-        Parent = ButtonInner;
+        BorderSizePixel  = 0;
+        Size             = UDim2.new(1, 0, 0, 2);
+        ZIndex           = 303;
+        Parent           = ButtonInner;
+    });
+
+    Library:Create('UICorner', {
+        CornerRadius = UDim.new(0, 3);
+        Parent       = AccentBar;
     });
 
     Library:AddToRegistry(AccentBar, {
         BackgroundColor3 = 'AccentColor';
     });
 
-    Library:CreateLabel({
-        Size = UDim2.new(1, 0, 1, 0);
-        TextSize = 14;
-        Text = Text;
-        ZIndex = 302;
-        Parent = ButtonInner;
+    -- Bottom accent bar (subtle mirror, 0.5 transparent)
+    local AccentBarBottom = Library:Create('Frame', {
+        BackgroundColor3    = Library.AccentColor;
+        BackgroundTransparency = 0.75;
+        BorderSizePixel     = 0;
+        AnchorPoint         = Vector2.new(0, 1);
+        Position            = UDim2.new(0, 0, 1, 0);
+        Size                = UDim2.new(1, 0, 0, 1);
+        ZIndex              = 303;
+        Parent              = ButtonInner;
     });
 
-    local IsDragging = false;
+    Library:Create('UICorner', {
+        CornerRadius = UDim.new(0, 3);
+        Parent       = AccentBarBottom;
+    });
+
+    Library:AddToRegistry(AccentBarBottom, {
+        BackgroundColor3 = 'AccentColor';
+    });
+
+    -- ── Hamburger icon ──────────────────────────────────────────────
+    local IconLabel = Library:Create('TextLabel', {
+        BackgroundTransparency = 1;
+        Position  = UDim2.new(0, 6, 0, 0);
+        Size      = UDim2.new(0, 16, 1, 0);
+        Font      = Enum.Font.GothamBold;
+        Text      = '☰';
+        TextColor3 = Library.AccentColor;
+        TextSize  = 12;
+        TextXAlignment = Enum.TextXAlignment.Center;
+        ZIndex    = 304;
+        Parent    = ButtonInner;
+    });
+
+    Library:AddToRegistry(IconLabel, {
+        TextColor3 = 'AccentColor';
+    });
+
+    -- Vertical divider between icon and text
+    local Divider = Library:Create('Frame', {
+        BackgroundColor3    = Library.OutlineColor or Color3.fromRGB(60, 60, 60);
+        BackgroundTransparency = 0.4;
+        BorderSizePixel     = 0;
+        Position            = UDim2.new(0, 23, 0, 4);
+        Size                = UDim2.new(0, 1, 1, -8);
+        ZIndex              = 304;
+        Parent              = ButtonInner;
+    });
+
+    Library:AddToRegistry(Divider, {
+        BackgroundColor3 = 'OutlineColor';
+    });
+
+    -- ── Text label ──────────────────────────────────────────────────
+    local TextLabel = Library:Create('TextLabel', {
+        BackgroundTransparency = 1;
+        Position  = UDim2.new(0, 28, 0, 0);
+        Size      = UDim2.new(1, -32, 1, 0);
+        Font      = Library.Font or Enum.Font.Gotham;
+        Text      = Text;
+        TextColor3 = Library.FontColor or Color3.fromRGB(240, 240, 240);
+        TextSize  = 12;
+        TextXAlignment = Enum.TextXAlignment.Left;
+        ZIndex    = 304;
+        Parent    = ButtonInner;
+    });
+
+    Library:AddToRegistry(TextLabel, {
+        TextColor3 = 'FontColor';
+    });
+
+    -- ── UIScale (for press/bounce animation) ────────────────────────
+    local Scale = Instance.new('UIScale');
+    Scale.Scale  = 1;
+    Scale.Parent = ButtonOuter;
+
+    -- ── Sounds ──────────────────────────────────────────────────────
+    local ClickSound = Instance.new('Sound');
+    ClickSound.SoundId  = 'rbxassetid://6895079853';  -- soft UI click
+    ClickSound.Volume   = 0.35;
+    ClickSound.RollOffMaxDistance = 0;
+    ClickSound.Parent   = ButtonOuter;
+
+    local HoverSound = Instance.new('Sound');
+    HoverSound.SoundId  = 'rbxassetid://6026984224';  -- subtle hover tick
+    HoverSound.Volume   = 0.12;
+    HoverSound.RollOffMaxDistance = 0;
+    HoverSound.Parent   = ButtonOuter;
+
+    -- ── Hover effects ───────────────────────────────────────────────
+    local isHovered  = false;
+    local isDragging = false;
+
+    local function lighten(c, amt)
+        return Color3.new(
+            math.clamp(c.R + amt, 0, 1),
+            math.clamp(c.G + amt, 0, 1),
+            math.clamp(c.B + amt, 0, 1)
+        );
+    end;
+
+    ButtonOuter.MouseEnter:Connect(function()
+        if isHovered then return end;
+        isHovered = true;
+        pcall(function() HoverSound:Play() end);
+
+        TweenService:Create(ButtonInner, fastTween, {
+            BackgroundColor3 = lighten(Library.MainColor, 0.05);
+        }):Play();
+
+        TweenService:Create(AccentBar, fastTween, {
+            Size = UDim2.new(1, 0, 0, 3);
+        }):Play();
+
+        TweenService:Create(IconLabel, fastTween, {
+            TextTransparency = 0.2;
+        }):Play();
+
+        TweenService:Create(Scale, fastTween, {
+            Scale = 1.04;
+        }):Play();
+    end);
+
+    ButtonOuter.MouseLeave:Connect(function()
+        if not isHovered then return end;
+        isHovered = false;
+
+        TweenService:Create(ButtonInner, fastTween, {
+            BackgroundColor3 = Library.MainColor;
+        }):Play();
+
+        TweenService:Create(AccentBar, fastTween, {
+            Size = UDim2.new(1, 0, 0, 2);
+        }):Play();
+
+        TweenService:Create(IconLabel, fastTween, {
+            TextTransparency = 0;
+        }):Play();
+
+        TweenService:Create(Scale, fastTween, {
+            Scale = 1;
+        }):Play();
+    end);
+
+    -- ── Drag + click ────────────────────────────────────────────────
     local DRAG_THRESHOLD = 6;
 
     ButtonOuter.InputBegan:Connect(function(Input)
         if Input.UserInputType ~= Enum.UserInputType.MouseButton1
-            and Input.UserInputType ~= Enum.UserInputType.Touch then
+        and Input.UserInputType ~= Enum.UserInputType.Touch then
             return;
         end;
 
-        IsDragging = false;
+        isDragging = false;
 
-        local StartX = Mouse.X;
-        local StartY = Mouse.Y;
-        local ObjX = Mouse.X - ButtonOuter.AbsolutePosition.X;
-        local ObjY = Mouse.Y - ButtonOuter.AbsolutePosition.Y;
+        -- Press-down squash
+        TweenService:Create(Scale, TweenInfo.new(0.07, Enum.EasingStyle.Quad), {
+            Scale = 0.91;
+        }):Play();
 
-        while InputService:IsMouseButtonPressed(Enum.UserInputType.MouseButton1) do
-            local dx = Mouse.X - StartX;
-            local dy = Mouse.Y - StartY;
+        -- Darken inner on press
+        TweenService:Create(ButtonInner, TweenInfo.new(0.07), {
+            BackgroundColor3 = lighten(Library.MainColor, -0.04);
+        }):Play();
+
+        local StartX = Input.Position.X;
+        local StartY = Input.Position.Y;
+        local ObjX   = Input.Position.X - ButtonOuter.AbsolutePosition.X;
+        local ObjY   = Input.Position.Y - ButtonOuter.AbsolutePosition.Y;
+
+        local moved = Input.Changed:Connect(function()
+            local dx = Input.Position.X - StartX;
+            local dy = Input.Position.Y - StartY;
 
             if math.abs(dx) > DRAG_THRESHOLD or math.abs(dy) > DRAG_THRESHOLD then
-                IsDragging = true;
+                isDragging = true;
             end;
 
-            if IsDragging then
+            if isDragging then
                 ButtonOuter.Position = UDim2.fromOffset(
-                    Mouse.X - ObjX,
-                    Mouse.Y - ObjY
+                    Input.Position.X - ObjX,
+                    Input.Position.Y - ObjY
                 );
             end;
+        end);
 
-            RenderStepped:Wait();
-        end;
+        Input.Changed:Connect(function()
+            if Input.UserInputState == Enum.UserInputState.End then
+                moved:Disconnect();
+            end;
+        end);
 
-        if not IsDragging then
-            task.spawn(Library.Toggle);
-        end;
+        -- Wait for release via InputEnded
+        local releaseConn;
+        releaseConn = game:GetService('UserInputService').InputEnded:Connect(function(endInput)
+            if endInput ~= Input then return end;
+            releaseConn:Disconnect();
 
-        IsDragging = false;
+            moved:Disconnect();
+
+            -- Release bounce-back
+            TweenService:Create(Scale, bounceTween, {
+                Scale = isHovered and 1.04 or 1;
+            }):Play();
+
+            TweenService:Create(ButtonInner, fastTween, {
+                BackgroundColor3 = isHovered
+                    and lighten(Library.MainColor, 0.05)
+                    or  Library.MainColor;
+            }):Play();
+
+            if not isDragging then
+                -- Accent flash on click
+                pcall(function() ClickSound:Play() end);
+
+                TweenService:Create(AccentBar, TweenInfo.new(0.05), {
+                    BackgroundColor3 = Color3.new(1, 1, 1);
+                    Size = UDim2.new(1, 0, 0, 2);
+                }):Play();
+
+                task.delay(0.12, function()
+                    TweenService:Create(AccentBar, TweenInfo.new(0.25), {
+                        BackgroundColor3 = Library.AccentColor;
+                    }):Play();
+                end);
+
+                task.spawn(Library.Toggle);
+            end;
+
+            isDragging = false;
+        end);
     end);
 
-    -- Mobile tap support (TouchTap only fires when there's no significant movement)
+    -- Mobile TouchTap fallback
     ButtonOuter.TouchTap:Connect(function()
-        if not IsDragging then
+        if not isDragging then
+            pcall(function() ClickSound:Play() end);
             task.spawn(Library.Toggle);
         end;
     end);
