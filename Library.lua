@@ -3072,7 +3072,7 @@ function Library:CreateToggleButton(Text)
         Position  = UDim2.new(0, 28, 0, 0);
         Size      = UDim2.new(1, -32, 1, 0);
         Font      = Library.Font or Enum.Font.Gotham;
-        Text      = Library.Toggled and 'Close' or 'Open';
+        Text      = 'Close';
         TextColor3 = Library.FontColor or Color3.fromRGB(240, 240, 240);
         TextSize  = 12;
         TextXAlignment = Enum.TextXAlignment.Left;
@@ -3158,10 +3158,10 @@ function Library:CreateToggleButton(Text)
     end);
 
     -- ── Drag + click ────────────────────────────────────────────────
-	local function doToggle()
+local function doToggle()
     task.spawn(function() Library:Toggle() end);
     task.defer(function()
-        TextLabel.Text = Library.Toggled and 'Close' or 'Open';
+        TextLabel.Text = Library.Toggled and 'Open' or 'Close';
     end);
 end;
     local DRAG_THRESHOLD = 6;
@@ -3247,13 +3247,13 @@ end;
             end;
 
             isDragging = false;
-        end);
     end);
 
     -- Mobile TouchTap fallback
     ButtonOuter.TouchTap:Connect(function()
         if not isDragging then
             pcall(function() ClickSound:Play() end);
+        end);
             doToggle();
         end;
     end);
