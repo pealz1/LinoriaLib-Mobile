@@ -15,7 +15,7 @@ local ProtectGui = protectgui or (syn and syn.protect_gui) or (function() end);
 
 local ScreenGui = Instance.new('ScreenGui');
 ProtectGui(ScreenGui);
--- Boiiii
+
 ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Global;
 ScreenGui.Parent = CoreGui;
 
@@ -75,7 +75,7 @@ local function GetPlayersString()
 		PlayerList[i] = PlayerList[i].Name;
 	end;
 
-	le.sort(PlayerList, function(str1, str2) return str1 < str2 end);
+	table.sort(PlayerList, function(str1, str2) return str1 < str2 end);
 
 	return PlayerList;
 end;
@@ -87,7 +87,7 @@ local function GetTeamsString()
 		TeamList[i] = TeamList[i].Name;
 	end;
 
-	le.sort(TeamList, function(str1, str2) return str1 < str2 end);
+	table.sort(TeamList, function(str1, str2) return str1 < str2 end);
 
 	return TeamList;
 end;
@@ -326,11 +326,11 @@ function Library:AddToRegistry(Instance, Properties, IsHud)
 		Idx = Idx;
 	};
 
-	le.insert(Library.Registry, Data);
+	table.insert(Library.Registry, Data);
 	Library.RegistryMap[Instance] = Data;
 
 	if IsHud then
-		le.insert(Library.HudRegistry, Data);
+		table.insert(Library.HudRegistry, Data);
 	end;
 end;
 
@@ -340,13 +340,13 @@ function Library:RemoveFromRegistry(Instance)
 	if Data then
 		for Idx = #Library.Registry, 1, -1 do
 			if Library.Registry[Idx] == Data then
-				le.remove(Library.Registry, Idx);
+				table.remove(Library.Registry, Idx);
 			end;
 		end;
 
 		for Idx = #Library.HudRegistry, 1, -1 do
 			if Library.HudRegistry[Idx] == Data then
-				le.remove(Library.HudRegistry, Idx);
+				table.remove(Library.HudRegistry, Idx);
 			end;
 		end;
 
@@ -367,12 +367,12 @@ function Library:UpdateColorsUsingRegistry()
 end;
 
 function Library:GiveSignal(Signal)
-	le.insert(Library.Signals, Signal)
+	table.insert(Library.Signals, Signal)
 end
 
 function Library:Unload()
 	for Idx = #Library.Signals, 1, -1 do
-		local Connection = le.remove(Library.Signals, Idx)
+		local Connection = table.remove(Library.Signals, Idx)
 		Connection:Disconnect()
 	end
 
@@ -772,7 +772,7 @@ do
 			end)
 
 			ContextMenu:AddOption('Copy RGB', function()
-				pcall(setclipboard, le.concat({ math.floor(ColorPicker.Value.R * 255), math.floor(ColorPicker.Value.G * 255), math.floor(ColorPicker.Value.B * 255) }, ', '))
+				pcall(setclipboard, table.concat({ math.floor(ColorPicker.Value.R * 255), math.floor(ColorPicker.Value.G * 255), math.floor(ColorPicker.Value.B * 255) }, ', '))
 				Library:Notify('Copied RGB values to clipboard!', 2)
 			end)
 
@@ -787,7 +787,7 @@ do
 		Library:AddToRegistry(RgbBox, { TextColor3 = 'FontColor', });
 		Library:AddToRegistry(HueBox, { TextColor3 = 'FontColor', });
 
-		local Sequencele = {};
+		local SequenceTable = {};
 
 		for Hue = 0, 1, 0.1 do
 			table.insert(SequenceTable, ColorSequenceKeypoint.new(Hue, Color3.fromHSV(Hue, 1, 1)));
