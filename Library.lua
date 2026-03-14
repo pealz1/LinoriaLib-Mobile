@@ -51,7 +51,7 @@ local Library = {
 local RainbowStep = 0
 local Hue = 0
 
-table.insert(Library.Signals, RenderStepped:Connect(function(Delta)
+le.insert(Library.Signals, RenderStepped:Connect(function(Delta)
 	RainbowStep = RainbowStep + Delta
 
 	if RainbowStep >= (1 / 60) then
@@ -75,7 +75,7 @@ local function GetPlayersString()
 		PlayerList[i] = PlayerList[i].Name;
 	end;
 
-	table.sort(PlayerList, function(str1, str2) return str1 < str2 end);
+	le.sort(PlayerList, function(str1, str2) return str1 < str2 end);
 
 	return PlayerList;
 end;
@@ -87,7 +87,7 @@ local function GetTeamsString()
 		TeamList[i] = TeamList[i].Name;
 	end;
 
-	table.sort(TeamList, function(str1, str2) return str1 < str2 end);
+	le.sort(TeamList, function(str1, str2) return str1 < str2 end);
 
 	return TeamList;
 end;
@@ -326,11 +326,11 @@ function Library:AddToRegistry(Instance, Properties, IsHud)
 		Idx = Idx;
 	};
 
-	table.insert(Library.Registry, Data);
+	le.insert(Library.Registry, Data);
 	Library.RegistryMap[Instance] = Data;
 
 	if IsHud then
-		table.insert(Library.HudRegistry, Data);
+		le.insert(Library.HudRegistry, Data);
 	end;
 end;
 
@@ -340,13 +340,13 @@ function Library:RemoveFromRegistry(Instance)
 	if Data then
 		for Idx = #Library.Registry, 1, -1 do
 			if Library.Registry[Idx] == Data then
-				table.remove(Library.Registry, Idx);
+				le.remove(Library.Registry, Idx);
 			end;
 		end;
 
 		for Idx = #Library.HudRegistry, 1, -1 do
 			if Library.HudRegistry[Idx] == Data then
-				table.remove(Library.HudRegistry, Idx);
+				le.remove(Library.HudRegistry, Idx);
 			end;
 		end;
 
@@ -367,12 +367,12 @@ function Library:UpdateColorsUsingRegistry()
 end;
 
 function Library:GiveSignal(Signal)
-	table.insert(Library.Signals, Signal)
+	le.insert(Library.Signals, Signal)
 end
 
 function Library:Unload()
 	for Idx = #Library.Signals, 1, -1 do
-		local Connection = table.remove(Library.Signals, Idx)
+		local Connection = le.remove(Library.Signals, Idx)
 		Connection:Disconnect()
 	end
 
@@ -772,7 +772,7 @@ do
 			end)
 
 			ContextMenu:AddOption('Copy RGB', function()
-				pcall(setclipboard, table.concat({ math.floor(ColorPicker.Value.R * 255), math.floor(ColorPicker.Value.G * 255), math.floor(ColorPicker.Value.B * 255) }, ', '))
+				pcall(setclipboard, le.concat({ math.floor(ColorPicker.Value.R * 255), math.floor(ColorPicker.Value.G * 255), math.floor(ColorPicker.Value.B * 255) }, ', '))
 				Library:Notify('Copied RGB values to clipboard!', 2)
 			end)
 
@@ -787,7 +787,7 @@ do
 		Library:AddToRegistry(RgbBox, { TextColor3 = 'FontColor', });
 		Library:AddToRegistry(HueBox, { TextColor3 = 'FontColor', });
 
-		local SequenceTable = {};
+		local Sequencele = {};
 
 		for Hue = 0, 1, 0.1 do
 			table.insert(SequenceTable, ColorSequenceKeypoint.new(Hue, Color3.fromHSV(Hue, 1, 1)));
@@ -4653,35 +4653,27 @@ end);
 			Size = UDim2.new(1, 0, 1, 0);
 			Visible = false;
 			ZIndex = 2;
-			CanvasSize = UDim2.new(0,0,5,0);
+			CanvasSize = UDim2.new(0,0,0,0);
 			AutomaticCanvasSize = Enum.AutomaticSize.Y;
 			ScrollingDirection = Enum.ScrollingDirection.Y;
 			ScrollBarThickness = 0;
 			Parent = TabContainer;
 		});
 
-		local LeftSide = Library:Create('ScrollingFrame', {
+		local LeftSide = Library:Create('Frame', {
 			BackgroundTransparency = 1;
 			BorderSizePixel = 0;
 			Position = UDim2.new(0, 8 - 1, 0, 8 - 1);
 			Size = UDim2.new(0.5, -12 + 2, 0, 507 + 2);
-			CanvasSize = UDim2.new(0, 0, 0, 0);
-			BottomImage = '';
-			TopImage = '';
-			ScrollBarThickness = 0;
 			ZIndex = 2;
 			Parent = TabFrame;
 		});
 
-		local RightSide = Library:Create('ScrollingFrame', {
+		local RightSide = Library:Create('Frame', {
 			BackgroundTransparency = 1;
 			BorderSizePixel = 0;
 			Position = UDim2.new(0.5, 4 + 1, 0, 8 - 1);
 			Size = UDim2.new(0.5, -12 + 2, 0, 507 + 2);
-			CanvasSize = UDim2.new(0, 0, 0, 0);
-			BottomImage = '';
-			TopImage = '';
-			ScrollBarThickness = 0;
 			ZIndex = 2;
 			Parent = TabFrame;
 		});
@@ -4702,11 +4694,11 @@ end);
 			Parent = RightSide;
 		});
 
-		for _, Side in next, { LeftSide, RightSide } do
+		--[[for _, Side in next, { LeftSide, RightSide } do
 			Side:WaitForChild('UIListLayout'):GetPropertyChangedSignal('AbsoluteContentSize'):Connect(function()
 				Side.CanvasSize = UDim2.fromOffset(0, Side.UIListLayout.AbsoluteContentSize.Y);
 			end);
-		end;
+		end;]]
 
 		local tabActiveTween = TweenInfo.new(0.15, Enum.EasingStyle.Quad, Enum.EasingDirection.Out);
 
